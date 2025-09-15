@@ -40,10 +40,14 @@ npm install --save-dev style-loader css-loader html-loader
 echo "📦 Installing development server..."
 npm install --save-dev webpack-dev-server
 
+echo "📦 Installing jest and babel"
+npm install --save-dev jest @babel/preset-env babel-jest
+
 # Create basic project structure
 echo "📁 Creating project structure..."
 mkdir -p src
 mkdir -p dist
+
 
 # Create a basic template.html if it doesn't exist
 if [ ! -f "src/template.html" ]; then
@@ -83,6 +87,31 @@ EOF
     echo "✅ Created src/index.js"
 fi
 
+# Create a basic sum.js file if it doesn't exist
+if [ ! -f "src/sum.js" ]; then
+    cat > src/sum.js << 'EOF'
+// Sum function
+function sum(a, b) {
+    return a + b;
+}
+module.exports = sum;
+EOF
+    echo "✅ Created src/sum.js"
+fi
+
+# Create a basic sum.test.js file if it doesn't exist
+if [ ! -f "src/sum.test.js" ]; then
+    cat > src/sum.test.js << 'EOF'
+const sum = require('./sum.js');
+
+// Sum function test
+test('sum', () => {
+    expect(sum(1, 2)).toBe(3);
+});
+EOF
+    echo "✅ Created src/sum.test.js"
+fi
+
 # Add npm scripts to package.json
 echo "📝 Adding npm scripts to package.json..."
 
@@ -96,7 +125,10 @@ packageJson.scripts = {
     'build': 'webpack --mode production',
     'dev': 'webpack serve --mode development --open',
     'start': 'webpack serve --mode development',
-    'watch': 'webpack --mode development --watch'
+    'watch': 'webpack --mode development --watch',
+    'test': 'jest',
+    'test:watch': 'jest --watch',
+    'test:watchAll': 'jest --watchAll'
 };
 
 fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2));
@@ -122,9 +154,12 @@ echo "   • src/template.html (HTML template)"
 echo "   • src/index.js (main entry point)"
 echo ""
 echo "🚀 Available commands:"
-echo "   • npm run dev    - Start development server"
-echo "   • npm run build  - Build for production"
-echo "   • npm run watch  - Build and watch for changes"
+echo "   • npm run dev         - Start development server"
+echo "   • npm run build       - Build for production"
+echo "   • npm run watch       - Build and watch for changes"
+echo "   • npm test            - Run tests once"
+echo "   • npm run test:watch  - Run tests in watch mode"
+echo "   • npm run test:watchAll - Run all tests in watch mode"
 echo ""
 echo "💡 Next steps:"
 echo "   1. Add your CSS files to src/"
