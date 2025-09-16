@@ -46,6 +46,7 @@ npm install --save-dev jest @babel/preset-env babel-jest
 # Create basic project structure
 echo "📁 Creating project structure..."
 mkdir -p src
+mkdir -p tests
 mkdir -p dist
 
 
@@ -100,17 +101,59 @@ EOF
 fi
 
 # Create a basic sum.test.js file if it doesn't exist
-if [ ! -f "src/sum.test.js" ]; then
-    cat > src/sum.test.js << 'EOF'
-const sum = require('./sum.js');
+if [ ! -f "tests/sum.test.js" ]; then
+    cat > tests/sum.test.js << 'EOF'
+const sum = require('../src/sum.js');
 
 // Sum function test
 test('sum', () => {
     expect(sum(1, 2)).toBe(3);
 });
 EOF
-    echo "✅ Created src/sum.test.js"
+    echo "✅ Created tests/sum.test.js"
 fi
+
+# Create Jest configuration
+echo "📝 Creating Jest configuration..."
+cat > jest.config.js << 'EOF'
+module.exports = {
+  // Test environment
+  testEnvironment: 'node',
+  
+  // Test file patterns
+  testMatch: [
+    '**/tests/**/*.test.js',
+    '**/tests/**/*.spec.js'
+  ],
+  
+  // Setup files
+  setupFilesAfterEnv: [],
+  
+  // Coverage configuration
+  collectCoverage: false,
+  collectCoverageFrom: [
+    'src/**/*.js',
+    '!src/**/*.test.js',
+    '!src/**/*.spec.js'
+  ],
+  
+  // Coverage directories to ignore
+  coveragePathIgnorePatterns: [
+    '/node_modules/',
+    '/tests/',
+    '/dist/'
+  ],
+  
+  // Transform files
+  transform: {
+    '^.+\\.js$': 'babel-jest'
+  },
+  
+  // Module file extensions
+  moduleFileExtensions: ['js', 'json', 'jsx', 'ts', 'tsx', 'node']
+};
+EOF
+echo "✅ Created jest.config.js"
 
 # Add npm scripts to package.json
 echo "📝 Adding npm scripts to package.json..."
@@ -128,7 +171,8 @@ packageJson.scripts = {
     'watch': 'webpack --mode development --watch',
     'test': 'jest',
     'test:watch': 'jest --watch',
-    'test:watchAll': 'jest --watchAll'
+    'test:watchAll': 'jest --watchAll',
+    'test:coverage': 'jest --coverage'
 };
 
 fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2));
@@ -149,9 +193,11 @@ echo "   • webpack-dev-server"
 echo ""
 echo "📁 Project structure created:"
 echo "   • src/ (source files)"
+echo "   • tests/ (test files)"
 echo "   • dist/ (build output)"
 echo "   • src/template.html (HTML template)"
 echo "   • src/index.js (main entry point)"
+echo "   • tests/sum.test.js (sample test file)"
 echo ""
 echo "🚀 Available commands:"
 echo "   • npm run dev         - Start development server"
@@ -160,10 +206,13 @@ echo "   • npm run watch       - Build and watch for changes"
 echo "   • npm test            - Run tests once"
 echo "   • npm run test:watch  - Run tests in watch mode"
 echo "   • npm run test:watchAll - Run all tests in watch mode"
+echo "   • npm run test:coverage - Run tests with coverage report"
 echo ""
 echo "💡 Next steps:"
 echo "   1. Add your CSS files to src/"
 echo "   2. Import them in src/index.js"
-echo "   3. Run 'npm run dev' to start developing"
+echo "   3. Add your test files to tests/"
+echo "   4. Run 'npm run dev' to start developing"
+echo "   5. Run 'npm test' to run your tests"
 echo ""
 echo "Happy coding! 🎯"

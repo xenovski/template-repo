@@ -31,4 +31,16 @@ module.exports = {
       },
     ],
   },
+  // Exclude test files from webpack bundle
+  resolve: {
+    alias: {
+      // This helps with module resolution if needed
+    },
+  },
+  // Ignore test files during webpack processing
+  ignoreWarnings: [
+    {
+      module: /tests/,
+    },
+  ],
 };
