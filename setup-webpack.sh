@@ -192,6 +192,17 @@ EOF
     echo "✅ Created tests/axios.test.js"
 fi
 
+# Create .gitignore file
+echo "📝 Creating .gitignore..."
+cat > .gitignore << 'EOF'
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+EOF
+echo "✅ Created .gitignore"
+
 # Create Jest configuration
 echo "📝 Creating Jest configuration..."
 cat > jest.config.js << 'EOF'
@@ -275,6 +286,7 @@ echo "📁 Project structure created:"
 echo "   • src/ (source files)"
 echo "   • tests/ (test files)"
 echo "   • dist/ (build output)"
+echo "   • .gitignore (git ignore rules)"
 echo "   • src/template.html (HTML template)"
 echo "   • src/index.js (main entry point)"
 echo "   • tests/sum.test.js (sample test file)"
