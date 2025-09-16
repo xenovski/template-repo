@@ -43,6 +43,10 @@ npm install --save-dev webpack-dev-server
 echo "📦 Installing jest and babel"
 npm install --save-dev jest @babel/preset-env babel-jest
 
+# Install axios as dev dependency for testing reference
+echo "📦 Installing axios as dev dependency..."
+npm install --save-dev axios
+
 # Create basic project structure
 echo "📁 Creating project structure..."
 mkdir -p src
@@ -111,6 +115,81 @@ test('sum', () => {
 });
 EOF
     echo "✅ Created tests/sum.test.js"
+fi
+
+# Create an axios mocking test file
+if [ ! -f "tests/axios.test.js" ]; then
+    cat > tests/axios.test.js << 'EOF'
+/**
+ * AXIOS MOCKING EXAMPLES
+ * 
+ * This file shows how to mock axios HTTP requests in Jest tests.
+ * 
+ * For more comprehensive Jest mocking patterns, check out:
+ * - Jest Mocking Docs: https://jestjs.io/docs/mock-functions
+ * - Jest Mocking Guide: https://jestjs.io/docs/manual-mocks
+ * - Testing Library Mocking: https://testing-library.com/docs/guide-disappearance
+ */
+
+const axios = require('axios');
+
+// Mock axios
+jest.mock('axios');
+
+describe('Axios Mocking Examples', () => {
+    beforeEach(() => {
+        // Clear all mocks before each test
+        jest.clearAllMocks();
+    });
+
+    test('Mock successful GET request', async () => {
+        // Mock the axios.get method
+        const mockData = { id: 1, name: 'Test User', email: 'test@example.com' };
+        axios.get.mockResolvedValue({ data: mockData, status: 200 });
+
+        // Make the request
+        const response = await axios.get('https://jsonplaceholder.typicode.com/users/1');
+
+        // Assertions
+        expect(axios.get).toHaveBeenCalledTimes(1);
+        expect(axios.get).toHaveBeenCalledWith('https://jsonplaceholder.typicode.com/users/1');
+        expect(response.data).toEqual(mockData);
+        expect(response.status).toBe(200);
+    });
+
+    test('Mock failed GET request', async () => {
+        // Mock axios.get to reject with an error
+        const errorMessage = 'Network Error';
+        axios.get.mockRejectedValue(new Error(errorMessage));
+
+        // Make the request and expect it to throw
+        await expect(axios.get('https://invalid-url.com/api')).rejects.toThrow(errorMessage);
+        
+        expect(axios.get).toHaveBeenCalledTimes(1);
+        expect(axios.get).toHaveBeenCalledWith('https://invalid-url.com/api');
+    });
+
+    test('Mock multiple GET requests', async () => {
+        // Mock different responses for different URLs
+        const usersData = [{ id: 1, name: 'User 1' }, { id: 2, name: 'User 2' }];
+        const postsData = [{ id: 1, title: 'Post 1' }, { id: 2, title: 'Post 2' }];
+
+        axios.get
+            .mockResolvedValueOnce({ data: usersData, status: 200 })
+            .mockResolvedValueOnce({ data: postsData, status: 200 });
+
+        // Make multiple requests
+        const usersResponse = await axios.get('https://jsonplaceholder.typicode.com/users');
+        const postsResponse = await axios.get('https://jsonplaceholder.typicode.com/posts');
+
+        // Assertions
+        expect(axios.get).toHaveBeenCalledTimes(2);
+        expect(usersResponse.data).toEqual(usersData);
+        expect(postsResponse.data).toEqual(postsData);
+    });
+});
+EOF
+    echo "✅ Created tests/axios.test.js"
 fi
 
 # Create Jest configuration
@@ -190,6 +269,7 @@ echo "   • html-webpack-plugin"
 echo "   • style-loader & css-loader"
 echo "   • html-loader"
 echo "   • webpack-dev-server"
+echo "   • axios (dev dependency for testing reference)"
 echo ""
 echo "📁 Project structure created:"
 echo "   • src/ (source files)"
@@ -198,6 +278,7 @@ echo "   • dist/ (build output)"
 echo "   • src/template.html (HTML template)"
 echo "   • src/index.js (main entry point)"
 echo "   • tests/sum.test.js (sample test file)"
+echo "   • tests/axios.test.js (axios mocking examples)"
 echo ""
 echo "🚀 Available commands:"
 echo "   • npm run dev         - Start development server"
